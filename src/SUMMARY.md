@@ -5,3 +5,6 @@
 # Setup
 - [Laptop](./laptop.md)
 - [Android Phone](./android.md)
+
+# Reversing
+- [Decompilation](./decompilation.md)

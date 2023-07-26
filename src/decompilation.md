@@ -24,3 +24,7 @@ Now we can launch jadx on it:
 ```
 jadx-gui base.apk
 ```
+
+### References
+
+* https://doubleagent.net/2023/05/21/a-car-battery-monitor-tracking-your-location

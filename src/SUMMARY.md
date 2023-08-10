@@ -10,3 +10,6 @@
 - [Static Analysis](./reversing/static.md)
     - [Decompilation](./reversing/static/decompilation.md)
     - [Observing Network Traffic](./reversing/static/network.md)
+
+- [Frida](./reversing/frida/index.md)
+    - [Setup](./reversing/frida/setup.md)

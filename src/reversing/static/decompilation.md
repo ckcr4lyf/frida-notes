@@ -25,6 +25,10 @@ Now we can launch jadx on it:
 jadx-gui base.apk
 ```
 
+This can help determine stuff such as which different classes are being used, what is being passed around, who is calling whom etc. 
+
+A lot of this would be useful when we are dynamically changing stuff with Frida.
+
 ### References
 
 * https://doubleagent.net/2023/05/21/a-car-battery-monitor-tracking-your-location

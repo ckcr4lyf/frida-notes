@@ -7,4 +7,6 @@
 - [Android Phone](./android.md)
 
 # Reversing
-- [Decompilation](./decompilation.md)
+- [Static Analysis](./reversing/static.md)
+    - [Decompilation](./reversing/static/decompilation.md)
+    - [Observing Network Traffic](./reversing/static/network.md)

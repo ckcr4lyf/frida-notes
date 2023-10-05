@@ -13,3 +13,4 @@
 
 - [Frida](./reversing/frida/index.md)
     - [Setup](./reversing/frida/setup.md)
+    - [Cheatsheet](./reversing/frida/cheatsheet.md)

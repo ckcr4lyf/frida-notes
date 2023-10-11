@@ -76,3 +76,14 @@ Java.enumerateClassLoaders({
 }, 0);
 
 ```
+
+## Native Functions
+
+Listing all native functions for a particular lib (e.g. `libmain.so`):
+
+```js
+    var exports = Module.enumerateExports('libmain.so');
+    for (var i = 0; i < exports.length; i++){
+        console.log(`Exported function: `, exports[i].name);
+    }
+```

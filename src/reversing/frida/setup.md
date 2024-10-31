@@ -8,7 +8,7 @@ We will use virtual env to install frida to play nice with system python and oth
 python3 -m venv frida-venv
 source frida-venv/bin/activate
 pip3 install -U setuptools
-pip3 install frida-tools
+pip3 install frida-tools objection
 ```
 
 In the future, you should only need to do `source frida-venv/bin/activate`

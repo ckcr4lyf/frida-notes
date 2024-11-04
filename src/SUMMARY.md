@@ -4,7 +4,8 @@
 
 # Setup
 - [Laptop](./laptop.md)
-- [Android Phone](./android.md)
+- [Android Phone](./android/index.md)
+    - [Rooting](./android/rooting.md)
 
 # Reversing
 - [Static Analysis](./reversing/static/index.md)

@@ -83,3 +83,6 @@ Download the ZIP file, and then in Magisk, open the modules section. Install thi
 
 Now try running YASNAC and spic-android again. YASNAC should pass both checks, and spic should show `DEVICE_INTEGRITY`. This should be sufficient for most applications. Anyway for the tricky ones, we can patch dynamically at runtime with Frida!
 
+## References
+
+* [https://xdaforums.com/t/rooting-the-google-pixel-6a.4475759/](https://xdaforums.com/t/rooting-the-google-pixel-6a.4475759/)

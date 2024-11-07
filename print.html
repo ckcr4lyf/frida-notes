@@ -1,0 +1,419 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Frida Notes</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">Setup</li><li class="chapter-item expanded "><a href="laptop.html"><strong aria-hidden="true">1.</strong> Laptop</a></li><li class="chapter-item expanded "><a href="android/index.html"><strong aria-hidden="true">2.</strong> Android Phone</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="android/rooting.html"><strong aria-hidden="true">2.1.</strong> Rooting</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Reversing</li><li class="chapter-item expanded "><a href="reversing/static/index.html"><strong aria-hidden="true">3.</strong> Static Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="reversing/static/decompilation.html"><strong aria-hidden="true">3.1.</strong> Decompilation</a></li><li class="chapter-item expanded "><a href="reversing/static/network.html"><strong aria-hidden="true">3.2.</strong> Observing Network Traffic</a></li></ol></li><li class="chapter-item expanded "><a href="reversing/frida/index.html"><strong aria-hidden="true">4.</strong> Frida</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="reversing/frida/setup.html"><strong aria-hidden="true">4.1.</strong> Setup</a></li><li class="chapter-item expanded "><a href="reversing/frida/cheatsheet.html"><strong aria-hidden="true">4.2.</strong> Cheatsheet</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Frida Notes</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>This book contains some notes and such on using Frida for various scenarios. It focuses on reverse engineering Android Apps.</p>
+<h2 id="tools"><a class="header" href="#tools">Tools</a></h2>
+<p>Some of the tools use are listed here. </p>
+<p>TODO: Setup tutorial?</p>
+<ul>
+<li><a href="https://github.com/frida/frida/">Frida</a> - used to inject custom scripts and logic into android applications at runtime</li>
+<li><a href="https://github.com/sensepost/objection/">Objection</a> - wrapper around Frida with some utilties to make RE easier</li>
+<li><a href="https://github.com/mitmproxy/mitmproxy">mitmproxy</a> - proxy that allows inspecting TLS traffic fron Android apps</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="laptop"><a class="header" href="#laptop">Laptop</a></h1>
+<p>I am personally using Arch Linux. If you're on some kind of Linux distro, most of the stuff should be the same.</p>
+<h2 id="tools-1"><a class="header" href="#tools-1">Tools</a></h2>
+<p>Covers the tools needed on the laptop to help RE Android Apps</p>
+<h3 id="android-debug-bridge-adb"><a class="header" href="#android-debug-bridge-adb">Android Debug Bridge (adb)</a></h3>
+<p>We need to use <a href="https://wiki.archlinux.org/title/Android_Debug_Bridge">adb</a> to interact with the phone from a CLI, including copying files to it, pulling files from it etc.</p>
+<p>Install on arch: <code>pacman -S android-tools</code></p>
+<p>Some generic installation instructions are available on <a href="https://www.xda-developers.com/install-adb-windows-macos-linux/">XDA Developers</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="android-phone"><a class="header" href="#android-phone">Android Phone</a></h1>
+<p>A rooted phone is needed. Performing the initial root is out of scope (for now). We assume the phone is rooted with Magisk v26. (Later versions might work, not tested with this guide.)</p>
+<h2 id="emulation"><a class="header" href="#emulation">Emulation</a></h2>
+<p>It is also possible to emulate the app. I've personally used <a href="https://github.com/waydroid/waydroid/">Waydroid</a> and loaded Frida in it, it seems to work fairly well.</p>
+<p>There are also <a href="https://github.com/casualsnek/waydroid_script">some scripts</a> to add ARM translation if required, since Waydroid is container-based (running on a linux machine) and would run x86 Android by default.</p>
+<h3 id="forcing-the-abi-in-waydroid"><a class="header" href="#forcing-the-abi-in-waydroid">Forcing the ABI in Waydroid</a></h3>
+<p>Sometimes, an app may be architecture agnostic, e.g. run on both x86 and ARM. However there may be some obfuscation techniques loading a library, that is only compatible with an ARM architecture. While <code>libhoudini</code> provides a translation layer from ARM to x86, if the app is installed as x86, then it wouldn't load ARM native libraries.</p>
+<p>However, the ABI can be forced when installing apps into Waydroid. For instance, to force an app to install &quot;as ARM&quot;, you could oepn a shell in the device and run:</p>
+<pre><code>pm install --abi arm64-v8a [APK_PATH]
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="rooting"><a class="header" href="#rooting">Rooting</a></h1>
+<h2 id="recommended-phones"><a class="header" href="#recommended-phones">Recommended Phones</a></h2>
+<p>I'd personally recommed a Pixel for rooting. They come with true stock Android and almost no restrictions. <a href="https://developers.google.com/android/images">Additionally Google provides very convenient official download links to the firmware for all models and versions</a>, which makes the process quite straightforward.</p>
+<p>For this guide, I'm going to proceed with a Pixel 6a, which I picked up from Taobao (2nd hand) for ~800RMB.</p>
+<h2 id="rooting-the-phone"><a class="header" href="#rooting-the-phone">Rooting the Phone</a></h2>
+<p>Warning: This process will completely wipe all data from the phone!</p>
+<h3 id="prepare-the-phone"><a class="header" href="#prepare-the-phone">Prepare the phone</a></h3>
+<p>Enable developer options in your phone, and then go into it. Make sure OEM unlocking is enabled.</p>
+<p>On your laptop, pair the device with <code>adb</code> once as well. (e.g. just run <code>adb shell</code> and accept the connection).</p>
+<p>Finally, <a href="https://github.com/topjohnwu/Magisk/releases">download MagiskManager</a> on your phone, this will be used to patch the firmware.</p>
+<h3 id="patching-the-firmware"><a class="header" href="#patching-the-firmware">Patching the firmware</a></h3>
+<p>First, we need to download the official firmware from the <a href="https://developers.google.com/android/images#bluejay">Google download page</a>.</p>
+<p>This will download to a file like <code>bluejay-ap2a.240605.024-factory-6fcf1c35.zip</code>. Extract this archive, and inside will be another zip file. For me it was <code>image-bluejay-ap2a.240605.024.zip</code>. Extract this guy as well.</p>
+<p>Now, you should have a file called <code>boot.img</code>. Transfer this to your Android device. The easiest way is to use adb to push it to your phone:</p>
+<pre><code>adb push boot.img /sdcard/Download
+</code></pre>
+<p>Then, open the Magisk app. Select &quot;Install&quot;, and then &quot;Patch&quot;. Select your <code>boot.img</code> file, and let Magisk patch it. This should produce a file like <code>magisk_patched-27000_xvyfB.img</code>. Transfer this back to your computer:</p>
+<pre><code>adb pull /sdcard/Download/magisk_patched-27000_xvyfB.img .
+</code></pre>
+<h3 id="flashing-the-patched-firmware"><a class="header" href="#flashing-the-patched-firmware">Flashing the patched firmware</a></h3>
+<p>The next few commands we run will reboot the phone to the booatloader, unlock it for flashing, and then flash the patched image. </p>
+<p>We'll first wipe the phone:</p>
+<pre><code>adb reboot bootloader
+fastboot erase userdata
+fastboot reboot
+</code></pre>
+<p>Now that it's reset, you'll need to enable developer options and USB debugging again. Then:</p>
+<pre><code>adb reboot bootloader
+fastboot flashing unlock
+fastboot flash boot magisk_patched-27000_xvyfB.img
+fastboot reboot
+</code></pre>
+<p>That's it! You're technically now root! Next we'll install Magisk and some Modules...</p>
+<h2 id="disable-updates"><a class="header" href="#disable-updates">Disable Updates</a></h2>
+<p>Before we even connect the device to the internet, it's a good idea to disable all updates. The reason is sometimes if something like PlayServices get's updated, then the fixes around PlayIntegrity (formerly SafetyNet) we do will stop working.</p>
+<ol>
+<li>Open Play Store. It will ask you to Sign In, but in the top right you'll have three dots, from where you can uncheck &quot;Auto-Update Google Apps&quot;</li>
+<li>In developer options, navigate down to &quot;Automatic system updates&quot;, and disable this</li>
+</ol>
+<h2 id="magisk-and-other-modules"><a class="header" href="#magisk-and-other-modules">Magisk and other Modules</a></h2>
+<p>First, we will download some applications:</p>
+<ul>
+<li><a href="https://github.com/RikkaW/YASNAC">YASNAC</a> - Used to verify if we pass SafetyNet</li>
+<li><a href="https://github.com/herzhenr/spic-android">spic-andriod</a> - Used to verify if we pass PlayIntegrity</li>
+</ul>
+<p>Download them and run both tests, they should fail (this is ok). We will now fix it.</p>
+<p>Open the existing Magisk app once. It'll ask for an update, and then when you open it again it'll reboot the device. Then, in Magisk settings, enable &quot;Zygisk&quot; and &quot;Enforce Denylist&quot;, and reboot once more.</p>
+<p>Now, we will download the <a href="https://github.com/chiteroman/PlayIntegrityFix/releases">PlayIntegrityFix</a> module. This will help us pass the integrity checks used by some apps.</p>
+<p>Download the ZIP file, and then in Magisk, open the modules section. Install this module, and then reboot.</p>
+<p>Now try running YASNAC and spic-android again. YASNAC should pass both checks, and spic should show <code>DEVICE_INTEGRITY</code>. This should be sufficient for most applications. Anyway for the tricky ones, we can patch dynamically at runtime with Frida!</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<ul>
+<li><a href="https://xdaforums.com/t/rooting-the-google-pixel-6a.4475759/">https://xdaforums.com/t/rooting-the-google-pixel-6a.4475759/</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="static-analysis"><a class="header" href="#static-analysis">Static Analysis</a></h1>
+<p>In this guide I stretch the definition a bit to include &quot;passive&quot; as well. These techniques include stuff such as:</p>
+<ul>
+<li>Looking at decompiled source code</li>
+<li>Observing network requests (but <em>not</em> modifying them)</li>
+<li>???</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="decompilation"><a class="header" href="#decompilation">Decompilation</a></h1>
+<p>Android apps can be decompiled to Java source fairly well, this can help significantly in understanding what's going on. </p>
+<p>One of the best tools for this is <a href="https://github.com/skylot/jadx">jadx</a>. Note: JADX is quite memory </p>
+<h2 id="pull-the-application"><a class="header" href="#pull-the-application">Pull the Application</a></h2>
+<p>We need to identify the application on the Android device and pull the associated APK. This can also be done via apps such as <a href="https://play.google.com/store/apps/details?id=com.aefyr.sai">Split APKs Installer</a>.</p>
+<pre><code>$ adb shell ps -A | grep leavehomesafe
+u0_a248       17599  17769 23390396 225972 0                  0 S hk.gov.ogcio.leavehomesafe
+
+$ adb shell pm path hk.gov.ogcio.leavehomesafe
+package:/data/app/~~aHXXxw9ISu-FhyhkqxOpsw==/hk.gov.ogcio.leavehomesafe-2uNVfPN1SDS4vCfz42WFlw==/base.apk
+
+$ adb pull /data/app/~~aHXXxw9ISu-FhyhkqxOpsw==/hk.gov.ogcio.leavehomesafe-2uNVfPN1SDS4vCfz42WFlw==/base.apk
+/data/app/~~aHXXxw9ISu-FhyhkqxOpsw==/hk.gov.ogcio.leavehomesafe-2uNVfPN1SDS4vCfz42WFlw==/base.apk: 1 file pulled, 0 skipped. 37.8 MB/s (58567607 bytes in 1.478s)
+</code></pre>
+<p>Now we can launch jadx on it:</p>
+<pre><code>jadx-gui base.apk
+</code></pre>
+<p>This can help determine stuff such as which different classes are being used, what is being passed around, who is calling whom etc. </p>
+<p>A lot of this would be useful when we are dynamically changing stuff with Frida.</p>
+<h3 id="references-1"><a class="header" href="#references-1">References</a></h3>
+<ul>
+<li>https://doubleagent.net/2023/05/21/a-car-battery-monitor-tracking-your-location</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="observing-network-traffic"><a class="header" href="#observing-network-traffic">Observing Network Traffic</a></h1>
+<p>In this section we will cover how to inspect the network traffic of the android phone to see what it is sending to remote servers, and what it is getting back.</p>
+<p>This section is purely passive - we do not try and modify the request / responses.</p>
+<p>Make sure you've installed the tools covered in the <a href="reversing/static//laptop.html#tools">laptop setup</a> and <a href="reversing/static//android.html">android setup</a> sections. Specifically, we need <a href="https://github.com/mitmproxy/mitmproxy">mitmproxy</a>, <a href="https://github.com/madeye/proxydroid">proxydroid</a> &amp; <a href="https://github.com/topjohnwu/Magisk">magisk</a>. Other setup will be covered here.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="frida"><a class="header" href="#frida">Frida</a></h1>
+<p>Frida is an incredible tool to inspect the state of a running app, extracting value from it, as well as hooking into functions to see what is being passed as an argument, what is being returned, and even the ability to modify these values.</p>
+<p>We will start with some simple techniques, and then really dive into different obfuscation tactics and working around them.</p>
+<p>I will try and have a small &quot;Crack Me&quot; <code>.apk</code> with each different kind of &quot;technique&quot;. </p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="setup"><a class="header" href="#setup">Setup</a></h1>
+<h2 id="python-virtualenvs"><a class="header" href="#python-virtualenvs">Python virtualenvs</a></h2>
+<p>We will use virtual env to install frida to play nice with system python and other crap that pip does</p>
+<pre><code>python3 -m venv frida-venv
+source frida-venv/bin/activate
+pip3 install -U setuptools
+pip3 install frida-tools objection
+</code></pre>
+<p>In the future, you should only need to do <code>source frida-venv/bin/activate</code></p>
+<h2 id="android-phone-1"><a class="header" href="#android-phone-1">Android Phone</a></h2>
+<p>Grab the lastest Android <code>frida-server</code> from https://github.com/frida/frida/releases . Typically it should be for arm64. The file should be something like <code>frida-server-16.5.6-android-arm64.xz</code></p>
+<p>Extract it via <code>xz -d frida-server-16.5.6-android-arm64.xz</code>, then make it executable <code>chmod +x frida-server-16.5.6-android-arm64</code></p>
+<p>Then push to phone via <code>adb push frida-server-16.5.6-android-arm64 /data/local/tmp/</code></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="cheatsheet"><a class="header" href="#cheatsheet">Cheatsheet</a></h1>
+<p>This contains common scripts which could be used with Frida for various purposes.</p>
+<p>For each script, I'll try and link to a page detailing more about what is going on.</p>
+<h2 id="hooking-a-function"><a class="header" href="#hooking-a-function">Hooking a function</a></h2>
+<p>Log arguments and return value</p>
+<pre><code class="language-js">setTimeout(function(){
+    Java.perform(function () {
+        const className = `com.example.TestClass`;
+        var clazz = Java.use(className);
+        console.log(`Hooking ${className}`)
+        clazz.testMethod.implementation = function () {
+            console.log(&quot;\n&gt;&gt;&gt; testMethod() called!&quot;);
+            console.log(&quot;&gt;&gt;&gt; Arguments: &quot;, JSON.stringify(arguments)); // the arguments individually are [0], [1] etc.
+
+            // Call the real implementation to get the real return value
+            const retVal = clazz.testMethod.apply(this, arguments);
+            console.log(&quot;&lt;&lt;&lt; Return value&quot;, retVal);
+
+            // Here we can return the &quot;real&quot; value, or stub it with something else as well
+            return retVal;
+        }
+    });
+}, 0);
+</code></pre>
+<h2 id="hooking-dynamic-class-loaders"><a class="header" href="#hooking-dynamic-class-loaders">Hooking Dynamic Class Loaders</a></h2>
+<p>List all loaders</p>
+<pre><code class="language-js">setTimeout(function(){
+    Java.enumerateClassLoaders({
+        onMatch: function(loader){
+            console.log(`&gt;&gt;&gt; Received loader: ${loader}`);
+        },
+        onComplete: function(){
+
+        }
+    });
+}, 0);
+</code></pre>
+<p>Hooking methods from a particular class <a href="https://serializethoughts.com/2021/05/07/frida-java-classloaders">(thanks to serializethoughts)</a></p>
+<pre><code class="language-js">setTimeout(function(){
+Java.enumerateClassLoaders({
+        onMatch: function(loader){
+            Java.classFactory.loader = loader;
+            var TestClass;
+
+            // Hook the class if found, else try next classloader.
+            try{
+                TestClass = Java.use(&quot;com.example.TestClass&quot;);
+                TestClass.testMethod.implementation = function(){
+                    // Here you can stub it, log the arguments, change the return value etc.
+                    console.log(&quot;[+] Inside test method&quot;);
+                }
+            }catch(error){
+                if(error.message.includes(&quot;ClassNotFoundException&quot;)){
+                    console.log(&quot;\n You are trying to load encrypted class, trying next loader&quot;);
+                }
+            }
+        },
+        onComplete: function(){
+
+        }
+    });
+
+}, 0);
+
+</code></pre>
+<h2 id="native-functions"><a class="header" href="#native-functions">Native Functions</a></h2>
+<p>Listing all native functions for a particular lib (e.g. <code>libmain.so</code>):</p>
+<pre><code class="language-js">    var exports = Module.enumerateExports('libmain.so');
+    for (var i = 0; i &lt; exports.length; i++){
+        console.log(`Exported function: `, exports[i].name);
+    }
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

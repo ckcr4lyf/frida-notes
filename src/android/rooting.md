@@ -40,7 +40,7 @@ adb pull /sdcard/Download/magisk_patched-27000_xvyfB.img .
 
 The next few commands we run will reboot the phone to the booatloader, unlock it for flashing, and then flash the patched image. 
 
-We'll first wipe the phone:
+We'll first wipe the phone (note: if you are re-rooting after an OTA update removed root, you can skip this step to preserve your data):
 
 ```
 adb reboot bootloader
@@ -90,7 +90,7 @@ Download them and run both tests, they should fail (this is ok). We will now fix
 
 Open the existing Magisk app once. It'll ask for an update, and then when you open it again it'll reboot the device. Then, in Magisk settings, enable "Zygisk" and "Enforce Denylist", and reboot once more.
 
-Now, we will download the [PlayIntegrityFix](https://github.com/chiteroman/PlayIntegrityFix/releases) module. This will help us pass the integrity checks used by some apps.
+Now, we will download the [PlayIntegrityFix](https://github.com/KOWX712/PlayIntegrityFix/releases) module. This will help us pass the integrity checks used by some apps.
 
 Download the ZIP file, and then in Magisk, open the modules section. Install this module, and then reboot.
 

@@ -66,6 +66,19 @@ Before we even connect the device to the internet, it's a good idea to disable a
 1. Open Play Store. It will ask you to Sign In, but in the top right you'll have three dots, from where you can uncheck "Auto-Update Google Apps"
 2. In developer options, navigate down to "Automatic system updates", and disable this
 
+You cna further disable some OTA stuff with:
+
+```
+adb shell su -c 'pm disable com.google.android.gms/.update.SystemUpdateService'
+adb shell su -c 'pm disable com.google.android.gms/.update.SystemUpdateActivity'
+adb shell su -c 'pm disable com.google.android.gms/.update.SystemUpdateGcmTaskService'
+adb shell su -c 'pm disable com.google.android.gms/.update.SystemUpdatePersistentListenerService'
+adb shell su -c 'pm disable com.google.android.gms/.update.phone.PopupDialog'
+adb shell su -c 'pm disable com.google.android.gms/.update.OtaSuggestionActivity'
+```
+
+(important, otherwise Pixel will push OTA stuff anyway!)
+
 ## Magisk and other Modules
 
 First, we will download some applications:
@@ -86,3 +99,4 @@ Now try running YASNAC and spic-android again. YASNAC should pass both checks, a
 ## References
 
 * [https://xdaforums.com/t/rooting-the-google-pixel-6a.4475759/](https://xdaforums.com/t/rooting-the-google-pixel-6a.4475759/)
+* [https://xdaforums.com/t/solved-prevent-automatic-updates-on-rooted-phone.4641962/post-89171463](https://xdaforums.com/t/solved-prevent-automatic-updates-on-rooted-phone.4641962/post-89171463)
